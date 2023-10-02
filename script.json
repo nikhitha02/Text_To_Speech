@@ -1,0 +1,52 @@
+// Get elements from the DOM
+const speechTextElement = document.getElementById('speech-text');
+const startButton = document.getElementById('start-button');
+
+// Create a new SpeechRecognition object
+const recognition = new webkitSpeechRecognition() || SpeechRecognition();
+
+// Set recognition options
+recognition.continuous = true;
+recognition.interimResults = true;
+
+// Event listener for when speech recognition starts
+recognition.onstart = () => {
+    speechTextElement.innerText = 'Listening...';
+};
+
+// Event listener for when speech recognition results are available
+recognition.onresult = (event) => {
+    let finalTranscript = '';
+    let interimTranscript = '';
+
+    // Loop through the results
+    for (let i = event.resultIndex; i < event.results.length; i++) {
+        const transcript = event.results[i][0].transcript;
+
+        // Check if the result is final or interim
+        if (event.results[i].isFinal) {
+            finalTranscript += transcript;
+        } else {
+            interimTranscript += transcript;
+        }
+    }
+
+    // Update the text content with the recognized speech
+    speechTextElement.innerText = finalTranscript;
+};
+
+// Event listener for when the speech recognition ends
+recognition.onend = () => {
+    speechTextElement.innerText = 'Speech recognition ended.';
+};
+
+// Event listener for the start button click
+startButton.addEventListener('click', () => {
+    recognition.start();
+});
+
+// Handle errors
+recognition.onerror = (event) => {
+    console.error('Speech recognition error:', event.error);
+};
+
